@@ -10,7 +10,6 @@ import {
   HStack,
   Icon,
   IconButton,
-  Link,
   Menu,
   MenuButton,
   MenuDivider,
@@ -23,34 +22,37 @@ import {
 } from "@chakra-ui/react";
 import { ReactText } from "react";
 import { IconType } from "react-icons";
-import {
-  FiBell,
-  FiChevronDown,
-  FiCompass,
-  FiHome,
-  FiMenu,
-  FiSettings,
-  FiStar,
-  FiTrendingUp,
-} from "react-icons/fi";
-import { Outlet } from "react-router-dom";
+import { BiCategory } from "react-icons/bi";
+import { FiChevronDown, FiMenu } from "react-icons/fi";
+import { GiConverseShoe } from "react-icons/gi";
+import { MdOutlinePayments } from "react-icons/md";
+import { PiPackageDuotone } from "react-icons/pi";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 interface LinkItemProps {
   name: string;
   icon: IconType;
+  linkTo: string;
 }
 const LinkItems: Array<LinkItemProps> = [
-  { name: "Home", icon: FiHome },
-  { name: "Trending", icon: FiTrendingUp },
-  { name: "Explore", icon: FiCompass },
-  { name: "Favourites", icon: FiStar },
-  { name: "Settings", icon: FiSettings },
+  { name: "Quản lý danh mục", linkTo: "/categories", icon: BiCategory },
+  { name: "Quản lý sản phẩm", linkTo: "/products", icon: GiConverseShoe },
+  { name: "Quản lý đơn hàng", linkTo: "/orders", icon: PiPackageDuotone },
+  {
+    name: "Phương thức thanh toán",
+    linkTo: "/payment-methods",
+    icon: MdOutlinePayments,
+  },
 ];
 
 export default function SidebarWithHeader() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
-    <Box minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
+    <Box
+      minH="100vh"
+      bg={useColorModeValue("gray.100", "gray.900")}
+      className="!bg-white"
+    >
       <SidebarContent
         onClose={() => onClose}
         display={{ base: "none", md: "block" }}
@@ -100,7 +102,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
       {LinkItems.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
+        <NavItem key={link.name} icon={link.icon} linkTo={link.linkTo}>
           {link.name}
         </NavItem>
       ))}
@@ -111,39 +113,29 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 interface NavItemProps extends FlexProps {
   icon: IconType;
   children: ReactText;
+  linkTo: string;
 }
-const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
+const NavItem = ({ icon, linkTo, children, ...rest }: NavItemProps) => {
+  const { pathname } = useLocation();
+  const isActive = pathname.includes(linkTo);
   return (
-    <Link
-      href="#"
-      style={{ textDecoration: "none" }}
-      _focus={{ boxShadow: "none" }}
-    >
-      <Flex
-        align="center"
-        p="4"
-        mx="4"
-        borderRadius="lg"
-        role="group"
-        cursor="pointer"
-        _hover={{
-          bg: "cyan.400",
-          color: "white",
-        }}
-        {...rest}
-      >
-        {icon && (
-          <Icon
-            mr="4"
-            fontSize="16"
-            _groupHover={{
-              color: "white",
-            }}
-            as={icon}
-          />
-        )}
-        {children}
-      </Flex>
+    <Link to={linkTo}>
+      <div style={{ textDecoration: "none" }}>
+        <Flex
+          align="center"
+          p="4"
+          mx="4"
+          borderRadius="lg"
+          role="group"
+          cursor="pointer"
+          bg={isActive ? "teal.500" : "unset"}
+          color={isActive ? "white" : "black"}
+          {...rest}
+        >
+          {icon && <Icon mr="4" fontSize="16" as={icon} />}
+          {children}
+        </Flex>
+      </div>
     </Link>
   );
 };
@@ -182,12 +174,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       </Text>
 
       <HStack spacing={{ base: "0", md: "6" }}>
-        <IconButton
-          size="lg"
-          variant="ghost"
-          aria-label="open menu"
-          icon={<FiBell />}
-        />
         <Flex alignItems={"center"}>
           <Menu>
             <MenuButton
@@ -224,7 +210,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
             >
               <MenuItem>Profile</MenuItem>
               <MenuItem>Settings</MenuItem>
-              <MenuItem>Billing</MenuItem>
               <MenuDivider />
               <MenuItem>Sign out</MenuItem>
             </MenuList>
