@@ -10,3 +10,8 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.ant-modal-wrap,
+.ant-modal-mask {
+  z-index: 2000 !important;
+}

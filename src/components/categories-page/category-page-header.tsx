@@ -36,11 +36,13 @@ export type CategoryHeaderProps = {
   sortOption?: SortOption;
   setSortOption: React.Dispatch<React.SetStateAction<SortOption | undefined>>;
   setSearchKeyword: React.Dispatch<React.SetStateAction<string>>;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export default function CategoryPageHeader({
   setSortOption,
   setSearchKeyword,
+  setCurrentPage,
 }: CategoryHeaderProps) {
   const {
     isOpen: isCreateCategoryModalOpen,
@@ -56,7 +58,9 @@ export default function CategoryPageHeader({
       <div className="bg-white rounded-md">
         <Select
           placeholder="Sắp xếp theo"
-          onChange={(e) => handleChangeSortOption(e.target.value)}
+          onChange={(e) => {
+            handleChangeSortOption(e.target.value);
+          }}
         >
           {sortOptions.map((option) => (
             <option key={option.value} value={option.value}>
@@ -69,7 +73,10 @@ export default function CategoryPageHeader({
       <div className="flex gap-10 align-middle">
         <div className="relative">
           <Input
-            onChange={(e) => setSearchKeyword(e.target.value)}
+            onChange={(e) => {
+              setSearchKeyword(e.target.value);
+              setCurrentPage(1);
+            }}
             placeholder="Nhập tên danh mục"
             size="md"
             width={400}

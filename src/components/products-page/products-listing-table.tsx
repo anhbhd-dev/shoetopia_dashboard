@@ -1,51 +1,49 @@
 import {
+  Button,
   Table,
-  Thead,
-  Tbody,
-  Tfoot,
-  Tr,
-  Th,
-  Td,
-  TableCaption,
   TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
 } from "@chakra-ui/react";
-
+import { FaEye, FaRegTrashAlt } from "react-icons/fa";
 export default function ProductListingTable() {
   return (
-    <TableContainer>
+    <TableContainer className="min-h-[450px]">
       <Table variant="simple">
-        <TableCaption>Imperial to metric conversion factors</TableCaption>
         <Thead>
           <Tr>
-            <Th>To convert</Th>
-            <Th>into</Th>
-            <Th isNumeric>multiply by</Th>
+            <Th>ID</Th>
+            <Th>Avatar</Th>
+            <Th>Tên sản phẩm</Th>
+            <Th>Giá bán</Th>
+            <Th>Giá gốc</Th>
+            <Th></Th>
           </Tr>
         </Thead>
         <Tbody>
-          <Tr>
-            <Td>inches</Td>
-            <Td>millimetres (mm)</Td>
-            <Td isNumeric>25.4</Td>
-          </Tr>
-          <Tr>
-            <Td>feet</Td>
-            <Td>centimetres (cm)</Td>
-            <Td isNumeric>30.48</Td>
-          </Tr>
-          <Tr>
-            <Td>yards</Td>
-            <Td>metres (m)</Td>
-            <Td isNumeric>0.91444</Td>
-          </Tr>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Tr key={i}>
+              <Td>inches</Td>
+              <Td>millimetres (mm)</Td>
+              <Td>25.4</Td>
+              <Td>inches</Td>
+              <Td>millimetres (mm)</Td>
+              <Td width={"150px"}>
+                <div className="flex gap-5">
+                  <Button variant={"outline"} colorScheme="blue">
+                    <FaEye />
+                  </Button>
+                  <Button variant={"outline"} colorScheme="red">
+                    <FaRegTrashAlt />
+                  </Button>
+                </div>
+              </Td>
+            </Tr>
+          ))}
         </Tbody>
-        <Tfoot>
-          <Tr>
-            <Th>To convert</Th>
-            <Th>into</Th>
-            <Th isNumeric>multiply by</Th>
-          </Tr>
-        </Tfoot>
       </Table>
     </TableContainer>
   );

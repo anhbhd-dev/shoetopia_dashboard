@@ -14,16 +14,14 @@ export default function Pagination({
 }: PaginationPropsType) {
   return (
     <div className={className}>
-      {currentPage > 1 && (
-        <Button
-          colorScheme="teal"
-          variant="outline"
-          onClick={() => setCurrentPage(currentPage - 1)}
-          disabled={currentPage === 1}
-        >
-          Trang trước
-        </Button>
-      )}
+      <Button
+        colorScheme="teal"
+        variant="outline"
+        onClick={() => setCurrentPage(currentPage - 1)}
+        isDisabled={currentPage === 1}
+      >
+        Trang trước
+      </Button>
       {Array.from({ length: totalPage }).map((_, i) => (
         <Button
           onClick={() => setCurrentPage(i + 1)}
@@ -34,15 +32,15 @@ export default function Pagination({
           {i + 1}
         </Button>
       ))}
-      {currentPage < totalPage && (
-        <Button
-          colorScheme="teal"
-          variant="outline"
-          onClick={() => setCurrentPage(currentPage + 1)}
-        >
-          Trang sau
-        </Button>
-      )}
+
+      <Button
+        colorScheme="teal"
+        variant="outline"
+        onClick={() => setCurrentPage(currentPage + 1)}
+        isDisabled={currentPage === totalPage}
+      >
+        Trang sau
+      </Button>
     </div>
   );
 }

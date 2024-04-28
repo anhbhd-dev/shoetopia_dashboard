@@ -37,6 +37,7 @@ export default function CategoriesPage() {
   return (
     <main className="mr-5">
       <CategoryPageHeader
+        setCurrentPage={setCurrentPage}
         setSearchKeyword={setSearchKeyword}
         sortOption={sortOption}
         setSortOption={setSortOption}
@@ -48,14 +49,16 @@ export default function CategoriesPage() {
         <>
           <CategoriesListing categories={data.categories} />
 
-          <div className="flex justify-end">
-            <Pagination
-              className="flex gap-2 mt-10"
-              currentPage={currentPage}
-              totalPage={data.totalPage}
-              setCurrentPage={setCurrentPage}
-            />
-          </div>
+          {data?.categories?.length > 0 && (
+            <div className="flex justify-end">
+              <Pagination
+                className="flex gap-2 mt-10"
+                currentPage={currentPage}
+                totalPage={data.totalPage}
+                setCurrentPage={setCurrentPage}
+              />
+            </div>
+          )}
         </>
       )}
     </main>

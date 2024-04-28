@@ -2,6 +2,7 @@ import {
   Button,
   FormControl,
   FormLabel,
+  HStack,
   Input,
   Modal,
   ModalBody,
@@ -10,18 +11,22 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Radio,
+  RadioGroup,
   Select,
+  Textarea,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
-import { HiMagnifyingGlass } from "react-icons/hi2";
-import { SortOption } from "../../pages/categories-page";
-import { OrderBy, SortBy } from "../../enum/sort.enum";
-import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import { HiMagnifyingGlass } from "react-icons/hi2";
 import { createCategory } from "../../apis/category-services";
-
-const sortOptions = [
+import { OrderBy, SortBy } from "../../enum/sort.enum";
+import { SortOption } from "../../pages/categories-page";
+import MultipleUpload from "./multiple-upload";
+import SingleUploadAvatar from "./single-upload";
+export const productSortOptions = [
   {
     label: "Giá bán (tăng dần)",
     value: JSON.stringify({ sortBy: SortBy.CREATED_AT, orderBy: OrderBy.ASC }),
@@ -40,7 +45,7 @@ const sortOptions = [
   },
 ];
 
-export type CategoryHeaderProps = {
+export type HeaderProductsListingPageProps = {
   sortOption?: SortOption;
   setSortOption: React.Dispatch<React.SetStateAction<SortOption | undefined>>;
   setSearchKeyword: React.Dispatch<React.SetStateAction<string>>;
@@ -48,17 +53,17 @@ export type CategoryHeaderProps = {
 
 export default function HeaderProductsListingPage({
   setSortOption,
+  sortOption,
   setSearchKeyword,
-}: CategoryHeaderProps) {
+}: HeaderProductsListingPageProps) {
   const {
-    isOpen: isCreateCategoryModalOpen,
-    onOpen: openAddCategoryModal,
-    onClose: closeAddCategoryModal,
+    isOpen: isCreateProductModalOpen,
+    onOpen: openAddProductModal,
+    onClose: closeAddProductModal,
   } = useDisclosure();
   const handleChangeSortOption = (value: string) => {
     setSortOption(JSON.parse(value));
   };
-
   return (
     <div className="flex justify-between mt-5 mb-10">
       <div className="bg-white rounded-md">
@@ -66,8 +71,12 @@ export default function HeaderProductsListingPage({
           placeholder="Sắp xếp theo"
           onChange={(e) => handleChangeSortOption(e.target.value)}
         >
-          {sortOptions.map((option) => (
-            <option key={option.value} value={option.value}>
+          {productSortOptions.map((option) => (
+            <option
+              key={option.value}
+              value={option.value}
+              selected={JSON.stringify(sortOption) === option.value}
+            >
               {option.label}
             </option>
           ))}
@@ -78,35 +87,35 @@ export default function HeaderProductsListingPage({
         <div className="relative">
           <Input
             onChange={(e) => setSearchKeyword(e.target.value)}
-            placeholder="Nhập tên danh mục"
+            placeholder="Nhập từ khoá sản phẩm"
             size="md"
             width={400}
           />
           <HiMagnifyingGlass className="absolute top-3 right-3" />
         </div>
 
-        <Button colorScheme="teal" size="md" onClick={openAddCategoryModal}>
-          Thêm mới danh mục
+        <Button colorScheme="teal" size="md" onClick={openAddProductModal}>
+          Thêm mới sản phẩm
         </Button>
       </div>
 
-      <ModalAddNewCategory
-        isOpen={isCreateCategoryModalOpen}
-        onClose={closeAddCategoryModal}
+      <ModalAddNewProduct
+        isOpen={isCreateProductModalOpen}
+        onClose={closeAddProductModal}
       />
     </div>
   );
 }
 
-export type ModalAddNewCategoryProps = {
+export type ModalAddNewProductProps = {
   isOpen: boolean;
   onClose: () => void;
 };
 
-export function ModalAddNewCategory({
+export function ModalAddNewProduct({
   isOpen,
   onClose,
-}: ModalAddNewCategoryProps) {
+}: ModalAddNewProductProps) {
   const [categoryName, setCategoryName] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
@@ -142,16 +151,56 @@ export function ModalAddNewCategory({
       <form onSubmit={handleSubmitForm}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Thêm mới danh mục</ModalHeader>
+          <ModalHeader>Thêm mới sản phẩm</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <FormControl isRequired>
-              <FormLabel>Tên danh mục</FormLabel>
+              <FormLabel>Tên sản phẩm</FormLabel>
               <Input
                 value={categoryName}
                 onChange={(e) => setCategoryName(e.target.value)}
-                placeholder="Category name"
+                placeholder="Nhập tên sản phẩm"
               />
+            </FormControl>
+
+            <FormControl as="fieldset" mt={5}>
+              <FormLabel as="legend">Active?</FormLabel>
+              <RadioGroup defaultValue="Itachi">
+                <HStack spacing="24px">
+                  <Radio value="Sasuke">False</Radio>
+                  <Radio value="Nagato">True</Radio>
+                </HStack>
+              </RadioGroup>
+            </FormControl>
+
+            <FormControl as="fieldset" mt={5}>
+              <FormLabel as="legend">Là sản phẩm hot?</FormLabel>
+              <RadioGroup defaultValue="Itachi">
+                <HStack spacing="24px">
+                  <Radio value="Sasuke">False</Radio>
+                  <Radio value="Nagato">True</Radio>
+                </HStack>
+              </RadioGroup>
+            </FormControl>
+
+            <FormControl as="fieldset" mt={5}>
+              <FormLabel as="legend">Mô tả sản phẩm</FormLabel>
+              <Textarea rows={5} placeholder="Nhập mô tả sản phẩm" />
+            </FormControl>
+
+            <FormControl as="fieldset" mt={5}>
+              <FormLabel as="legend">Danh mục</FormLabel>
+              <Textarea rows={5} placeholder="Nhập mô tả sản phẩm" />
+            </FormControl>
+
+            <FormControl as="fieldset" mt={5}>
+              <FormLabel as="legend">Tải lên avatar</FormLabel>
+              <SingleUploadAvatar />
+            </FormControl>
+
+            <FormControl as="fieldset" mt={5}>
+              <FormLabel as="legend">Tải lên các ảnh</FormLabel>
+              <MultipleUpload />
             </FormControl>
           </ModalBody>
 
