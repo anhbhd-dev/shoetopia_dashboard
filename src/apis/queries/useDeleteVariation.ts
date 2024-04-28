@@ -2,14 +2,14 @@ import { useToast } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteVariation } from "../variation-service";
 
-export const useDeleteVariation = () => {
+export const useDeleteVariation = (productId: string) => {
   const queryClient = useQueryClient();
   const toast = useToast();
 
   return useMutation({
     mutationFn: deleteVariation,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: [productId] });
       toast({
         title: "Xóa biến thể thành công",
         status: "success",

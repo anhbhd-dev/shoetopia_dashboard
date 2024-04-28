@@ -1,4 +1,5 @@
 import {
+  Badge,
   Card,
   CardBody,
   CardHeader,
@@ -13,13 +14,13 @@ import { Image } from "antd";
 import { useParams } from "react-router-dom";
 import { useSingleProduct } from "../apis/queries/useSingleProduct";
 import { AddVariationModalButton } from "../components/variation/add-variation-modal";
+import DeleteVariationModalButton from "../components/variation/delete-product-modal";
 import { UpdateVariationModalButton } from "../components/variation/update-variation-modal";
 import { formatDate } from "../utils/format-date";
 import { formatMoneyVND } from "../utils/format-money";
-import DeleteVariationModalButton from "../components/variation/delete-product-modal";
 export default function ProductDetailPage() {
   const { id } = useParams();
-  const { data: product, isPending, isError } = useSingleProduct(id as string);
+  const { data: product } = useSingleProduct(id as string);
 
   return (
     <main>
@@ -41,11 +42,21 @@ export default function ProductDetailPage() {
                 </Tr>
                 <Tr>
                   <Td className="w-[200px]">Is hot</Td>
-                  <Td>{String(product?.isHot)}</Td>
+                  <Td className="uppercase ">{String(product?.isHot)}</Td>
                 </Tr>
                 <Tr>
                   <Td className="w-[200px]">Status</Td>
-                  <Td>{product?.isActive ? "Active" : "Inactive"}</Td>
+                  <Td className="uppercase ">
+                    {product?.isActive ? (
+                      <Badge ml="1" colorScheme="green">
+                        Active
+                      </Badge>
+                    ) : (
+                      <Badge ml="1" colorScheme="red">
+                        Inactive
+                      </Badge>
+                    )}
+                  </Td>
                 </Tr>
                 <Tr>
                   <Td className="w-[200px]">Mô tả</Td>

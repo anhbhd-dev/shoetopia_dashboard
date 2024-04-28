@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Image,
   Table,
@@ -52,11 +53,15 @@ export default function ProductListingTable({
                 </Td>
                 <Td>{item.name}</Td>
                 <Td>{formatDate(item.createdAt)}</Td>
-                <Td>
-                  {item.isActive ? (
-                    <span className="font-semibold text-green-500">Active</span>
+                <Td className="uppercase">
+                  {item?.isActive ? (
+                    <Badge ml="1" colorScheme="green">
+                      Active
+                    </Badge>
                   ) : (
-                    <span className="font-semibold text-red-500">Inactive</span>
+                    <Badge ml="1" colorScheme="red">
+                      Inactive
+                    </Badge>
                   )}
                 </Td>
                 <Td width={"150px"}>

@@ -19,6 +19,8 @@ import { FaPen } from "react-icons/fa";
 import * as Yup from "yup";
 import { useEditVariation } from "../../apis/queries/useEditVariation";
 import { UpdateVariationType } from "../../apis/variation-service";
+import { useParams } from "react-router-dom";
+import { useEffect } from "react";
 
 const regexNumberPattern = /^[0-9]+$/;
 
@@ -40,20 +42,10 @@ export function UpdateVariationModalButton({
   variationData,
 }: UpdateVariationModalButtonType) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const updateVariationMutation = useEditVariation(
-    variationData.productId as string
-  );
-
-  const initialValues: UpdateVariationType = {
-    size: variationData.size,
-    availableQuantity: variationData.availableQuantity,
-    unitPrice: variationData.unitPrice,
-    salePrice: variationData.salePrice,
-    _id: variationData._id,
-  };
+  const updateVariationMutation = useEditVariation(useParams().id as string);
 
   const { values, errors, setFieldValue, resetForm, handleSubmit } = useFormik({
-    initialValues,
+    initialValues: variationData,
     validationSchema,
     onSubmit: (values) => {
       const valuesToSubmit: UpdateVariationType = {
@@ -71,6 +63,9 @@ export function UpdateVariationModalButton({
       onClose();
     },
   });
+  useEffect(() => {
+    resetForm({ values: variationData });
+  }, [variationData, resetForm]);
   return (
     <>
       <Button colorScheme="blue" variant="outline" onClick={onOpen}>
@@ -146,7 +141,7 @@ export function UpdateVariationModalButton({
                   !!errors.availableQuantity ||
                   !!errors.unitPrice ||
                   !!errors.size ||
-                  JSON.stringify(initialValues) === JSON.stringify(values)
+                  JSON.stringify(variationData) === JSON.stringify(values)
                 }
                 type="submit"
               >

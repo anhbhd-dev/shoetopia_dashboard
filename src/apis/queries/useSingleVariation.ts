@@ -3,7 +3,7 @@ import { fetchVariationById } from "../variation-service";
 
 export const useSingleVariation = (variationId: string) => {
   return useQuery({
-    queryKey: ["products", variationId],
+    queryKey: [variationId],
     queryFn: () => fetchVariationById(variationId),
   });
 };

@@ -23,7 +23,7 @@ export default function DeleteVariationModalButton({
 }: DeleteVariationProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);
-  const deleteVariationMutation = useDeleteVariation();
+  const deleteVariationMutation = useDeleteVariation(useParams().id as string);
   const { id } = useParams();
   const handleDeleteVariation = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
