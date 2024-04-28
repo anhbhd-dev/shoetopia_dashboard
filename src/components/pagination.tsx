@@ -12,6 +12,8 @@ export default function Pagination({
   totalPage,
   setCurrentPage,
 }: PaginationPropsType) {
+  if (totalPage < 1) return null;
+
   return (
     <div className={className}>
       <Button

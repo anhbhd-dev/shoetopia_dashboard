@@ -11,6 +11,7 @@ import {
 import DeleteCategoryModal from "./delete-category-modal";
 import { ModalEditCategory } from "./edit-category-modal";
 import { Category } from "../../types/category.type";
+import { formatDate } from "../../utils/format-date";
 
 export type CategoriesListingProps = {
   categories: Category[];
@@ -38,7 +39,7 @@ export default function CategoriesListing({
               <Tr key={category._id}>
                 <Td>{category._id.slice(0, 10)}</Td>
                 <Td>{category.name}</Td>
-                <Td>25.4</Td>
+                <Td>{formatDate(category.createdAt)}</Td>
                 <Td width={"200px"}>
                   <div className="flex gap-4">
                     <ModalEditCategory category={category} />

@@ -17,12 +17,9 @@ import {
   Select,
   Textarea,
   useDisclosure,
-  useToast,
 } from "@chakra-ui/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { HiMagnifyingGlass } from "react-icons/hi2";
-import { createCategory } from "../../apis/category-services";
 import { useCategories } from "../../apis/queries/useCategories";
 import { OrderBy, SortBy } from "../../enum/sort.enum";
 import { SortOption } from "../../pages/categories-page";
@@ -32,16 +29,18 @@ import SingleUploadAvatar from "./single-upload";
 
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useCreateProduct } from "../../apis/queries/useCreateProduct";
+import { uploadToCloudinary } from "../../utils/upload-to-cloudinary";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const productSortOptions = [
   {
-    label: "Giá bán (tăng dần)",
-    value: JSON.stringify({ sortBy: SortBy.CREATED_AT, orderBy: OrderBy.ASC }),
+    label: "Tên (a-z)",
+    value: JSON.stringify({ sortBy: SortBy.NAME, orderBy: OrderBy.ASC }),
   },
   {
-    label: "Giá bán (giảm dần)",
-    value: JSON.stringify({ sortBy: SortBy.CREATED_AT, orderBy: OrderBy.DESC }),
+    label: "Tên (z-a)",
+    value: JSON.stringify({ sortBy: SortBy.NAME, orderBy: OrderBy.DESC }),
   },
   {
     label: "Ngày tạo (mới nhất)",
@@ -113,10 +112,11 @@ export default function HeaderProductsListingPage({
 }
 
 const validationCreateProductSchema = Yup.object().shape({
-  name: Yup.string().required("Tên sản phẩm là bắt buộc"),
+  name: Yup.string().required("Tên sản phẩm là bắt buộc").trim(),
   description: Yup.string()
     .min(20, "Mô tả dài ít nhất 20 ký tự")
-    .required("Mô tả là bắt buộc"),
+    .required("Mô tả là bắt buộc")
+    .trim(),
   isHot: Yup.boolean(),
   isActive: Yup.boolean(),
   categoryId: Yup.string().required("Danh mục là bắt buộc"),
@@ -146,56 +146,49 @@ export function ModalAddNewProduct({
   isOpen,
   onClose,
 }: ModalAddNewProductProps) {
-  const [categoryName, setCategoryName] = useState<string>("");
   const [categorySearchKeyword, setCategorySearchKeyword] =
     useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const toast = useToast();
-  const queryClient = useQueryClient();
+
   const { data, isError, isPending } = useCategories({
     name: categorySearchKeyword,
     limit: 20,
   });
+  const createProductMutation = useCreateProduct();
 
-  const { values, errors, handleChange, setFieldValue } = useFormik({
+  const {
+    values,
+    errors,
+    handleChange,
+    setFieldValue,
+    handleSubmit,
+    resetForm,
+  } = useFormik({
     initialValues: initialValues,
     validationSchema: validationCreateProductSchema,
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+    onSubmit: async (values) => {
+      const avatarResponseData = await uploadToCloudinary(values.avatar);
+
+      const imagesResponseData = await Promise.all(
+        values.images.map((image) => uploadToCloudinary(image))
+      );
+
+      createProductMutation.mutate({
+        ...values,
+        avatar: avatarResponseData.data.url,
+        images: imagesResponseData.map((image) => image.data.url),
+      });
+      onClose();
+      resetForm();
     },
   });
 
-  const createCategoryMutation = useMutation({
-    mutationFn: createCategory,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      setIsLoading(false);
-      onClose();
-      toast({
-        title: "Thêm mới thành công",
-        description: "Một danh mục mới vừa được thêm vào",
-        status: "success",
-        duration: 1500,
-        isClosable: true,
-      });
-      setCategoryName("");
-    },
-    onError: () => {
-      throw new Error("Failed to create category");
-    },
-  });
-  async function handleSubmitForm(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setIsLoading(true);
-    createCategoryMutation.mutate(categoryName);
-  }
   useEffect(() => {
     setFieldValue("categoryId", data?.categories[0]?._id);
   }, [data?.categories, setFieldValue]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <form onSubmit={handleSubmitForm}>
+      <form onSubmit={handleSubmit}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Thêm mới sản phẩm</ModalHeader>
@@ -301,7 +294,7 @@ export function ModalAddNewProduct({
             </Button>
             <Button
               type="submit"
-              isLoading={isLoading}
+              isLoading={createProductMutation.isPending}
               isDisabled={
                 Boolean(errors.name) ||
                 Boolean(errors.avatar) ||

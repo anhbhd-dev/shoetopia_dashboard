@@ -96,8 +96,12 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       {...rest}
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Logo
+        <Text
+          fontSize="2xl"
+          fontFamily="monospace"
+          className="!font-extrabold uppercase"
+        >
+          Shoetopia
         </Text>
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
@@ -168,9 +172,9 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         display={{ base: "flex", md: "none" }}
         fontSize="2xl"
         fontFamily="monospace"
-        fontWeight="bold"
+        className="!font-extrabold uppercase"
       >
-        Logo
+        Shoetopia
       </Text>
 
       <HStack spacing={{ base: "0", md: "6" }}>
