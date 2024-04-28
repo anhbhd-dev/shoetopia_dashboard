@@ -40,7 +40,6 @@ const useSingleUpload = () => {
         };
       })
     );
-
     setFileList(updatedFileList);
   };
 

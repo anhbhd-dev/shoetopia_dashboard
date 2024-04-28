@@ -1,9 +1,14 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { Modal, Upload } from "antd";
-import React from "react";
 import useSingleUpload from "../../hooks/useSingleUpload";
+import { useEffect } from "react";
 
-const SingleUploadAvatar: React.FC = () => {
+export type SingleUploadAvatarType = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onSetFieldValue: any;
+};
+
+const SingleUploadAvatar = ({ onSetFieldValue }: SingleUploadAvatarType) => {
   const {
     image,
     previewOpen,
@@ -19,6 +24,10 @@ const SingleUploadAvatar: React.FC = () => {
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
+
+  useEffect(() => {
+    onSetFieldValue("avatar", image?.url);
+  }, [image, onSetFieldValue]);
 
   return (
     <>

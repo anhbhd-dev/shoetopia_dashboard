@@ -1,6 +1,7 @@
 import {
   Button,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   HStack,
   Input,
@@ -19,13 +20,20 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 import { createCategory } from "../../apis/category-services";
+import { useCategories } from "../../apis/queries/useCategories";
 import { OrderBy, SortBy } from "../../enum/sort.enum";
 import { SortOption } from "../../pages/categories-page";
+import { Category } from "../../types/category.type";
 import MultipleUpload from "./multiple-upload";
 import SingleUploadAvatar from "./single-upload";
+
+import { useFormik } from "formik";
+import * as Yup from "yup";
+
+// eslint-disable-next-line react-refresh/only-export-components
 export const productSortOptions = [
   {
     label: "Giá bán (tăng dần)",
@@ -67,10 +75,7 @@ export default function HeaderProductsListingPage({
   return (
     <div className="flex justify-between mt-5 mb-10">
       <div className="bg-white rounded-md">
-        <Select
-          placeholder="Sắp xếp theo"
-          onChange={(e) => handleChangeSortOption(e.target.value)}
-        >
+        <Select onChange={(e) => handleChangeSortOption(e.target.value)}>
           {productSortOptions.map((option) => (
             <option
               key={option.value}
@@ -107,6 +112,31 @@ export default function HeaderProductsListingPage({
   );
 }
 
+const validationCreateProductSchema = Yup.object().shape({
+  name: Yup.string().required("Tên sản phẩm là bắt buộc"),
+  description: Yup.string()
+    .min(20, "Mô tả dài ít nhất 20 ký tự")
+    .required("Mô tả là bắt buộc"),
+  isHot: Yup.boolean(),
+  isActive: Yup.boolean(),
+  categoryId: Yup.string().required("Danh mục là bắt buộc"),
+  avatar: Yup.string().required("Ảnh đại diện sản phẩm là bắt buộc"),
+  images: Yup.array()
+    .of(Yup.string())
+    .min(1, "Cần upload ít nhất 1 ảnh")
+    .required("Ảnh sản phẩm là bắt buộc"),
+});
+
+const initialValues = {
+  name: "",
+  description: "",
+  isHot: false,
+  isActive: false,
+  categoryId: "",
+  avatar: "",
+  images: [],
+};
+
 export type ModalAddNewProductProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -117,9 +147,23 @@ export function ModalAddNewProduct({
   onClose,
 }: ModalAddNewProductProps) {
   const [categoryName, setCategoryName] = useState<string>("");
+  const [categorySearchKeyword, setCategorySearchKeyword] =
+    useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
   const queryClient = useQueryClient();
+  const { data, isError, isPending } = useCategories({
+    name: categorySearchKeyword,
+    limit: 20,
+  });
+
+  const { values, errors, handleChange, setFieldValue } = useFormik({
+    initialValues: initialValues,
+    validationSchema: validationCreateProductSchema,
+    onSubmit: (values) => {
+      alert(JSON.stringify(values, null, 2));
+    },
+  });
 
   const createCategoryMutation = useMutation({
     mutationFn: createCategory,
@@ -145,6 +189,9 @@ export function ModalAddNewProduct({
     setIsLoading(true);
     createCategoryMutation.mutate(categoryName);
   }
+  useEffect(() => {
+    setFieldValue("categoryId", data?.categories[0]?._id);
+  }, [data?.categories, setFieldValue]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -154,53 +201,97 @@ export function ModalAddNewProduct({
           <ModalHeader>Thêm mới sản phẩm</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <FormControl isRequired>
+            <FormControl isRequired isInvalid={Boolean(errors?.name)}>
               <FormLabel>Tên sản phẩm</FormLabel>
               <Input
-                value={categoryName}
-                onChange={(e) => setCategoryName(e.target.value)}
+                value={values?.name}
+                onChange={handleChange("name")}
                 placeholder="Nhập tên sản phẩm"
               />
+              <FormErrorMessage>{errors?.name}</FormErrorMessage>
             </FormControl>
 
             <FormControl as="fieldset" mt={5}>
               <FormLabel as="legend">Active?</FormLabel>
-              <RadioGroup defaultValue="Itachi">
+              <RadioGroup defaultValue="false">
                 <HStack spacing="24px">
-                  <Radio value="Sasuke">False</Radio>
-                  <Radio value="Nagato">True</Radio>
+                  <Radio value="false">False</Radio>
+                  <Radio isDisabled value="true">
+                    True
+                  </Radio>
                 </HStack>
               </RadioGroup>
             </FormControl>
 
             <FormControl as="fieldset" mt={5}>
               <FormLabel as="legend">Là sản phẩm hot?</FormLabel>
-              <RadioGroup defaultValue="Itachi">
+              <RadioGroup defaultValue="false">
                 <HStack spacing="24px">
-                  <Radio value="Sasuke">False</Radio>
-                  <Radio value="Nagato">True</Radio>
+                  <Radio value="false">False</Radio>
+                  <Radio value="true">True</Radio>
                 </HStack>
               </RadioGroup>
             </FormControl>
 
-            <FormControl as="fieldset" mt={5}>
+            <FormControl
+              as="fieldset"
+              mt={5}
+              isInvalid={Boolean(errors?.description)}
+            >
               <FormLabel as="legend">Mô tả sản phẩm</FormLabel>
-              <Textarea rows={5} placeholder="Nhập mô tả sản phẩm" />
+              <Textarea
+                rows={5}
+                placeholder="Nhập mô tả sản phẩm"
+                value={values.description}
+                onChange={handleChange("description")}
+              />
+              <FormErrorMessage>{errors?.description}</FormErrorMessage>
             </FormControl>
 
-            <FormControl as="fieldset" mt={5}>
+            <FormControl
+              as="fieldset"
+              mt={5}
+              isInvalid={Boolean(errors?.categoryId)}
+            >
+              <Input
+                placeholder="Nhập từ khoá danh mục"
+                onChange={(e) => setCategorySearchKeyword(e.target.value)}
+                className="mb-4"
+                value={categorySearchKeyword}
+              />
               <FormLabel as="legend">Danh mục</FormLabel>
-              <Textarea rows={5} placeholder="Nhập mô tả sản phẩm" />
+              <Select
+                isDisabled={isError || isPending}
+                value={values.categoryId}
+                onChange={handleChange("categoryId")}
+              >
+                {data?.categories?.map((category: Category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
+              </Select>
+              <FormErrorMessage>{errors?.categoryId}</FormErrorMessage>
             </FormControl>
 
-            <FormControl as="fieldset" mt={5}>
+            <FormControl
+              as="fieldset"
+              mt={5}
+              isInvalid={Boolean(errors?.avatar)}
+            >
               <FormLabel as="legend">Tải lên avatar</FormLabel>
-              <SingleUploadAvatar />
+              <SingleUploadAvatar onSetFieldValue={setFieldValue} />
+              <FormErrorMessage>{errors?.avatar}</FormErrorMessage>
             </FormControl>
 
-            <FormControl as="fieldset" mt={5}>
+            <FormControl
+              as="fieldset"
+              mt={5}
+              isInvalid={Boolean(errors?.images)}
+            >
               <FormLabel as="legend">Tải lên các ảnh</FormLabel>
-              <MultipleUpload />
+              <MultipleUpload onSetFieldValue={setFieldValue} />
+              <FormErrorMessage>{errors?.images}</FormErrorMessage>
             </FormControl>
           </ModalBody>
 
@@ -211,7 +302,15 @@ export function ModalAddNewProduct({
             <Button
               type="submit"
               isLoading={isLoading}
-              isDisabled={!categoryName.length}
+              isDisabled={
+                Boolean(errors.name) ||
+                Boolean(errors.avatar) ||
+                Boolean(errors.images) ||
+                Boolean(errors.categoryId) ||
+                Boolean(errors.description) ||
+                Boolean(errors.isActive) ||
+                Boolean(errors.isHot)
+              }
               colorScheme="teal"
             >
               Lưu

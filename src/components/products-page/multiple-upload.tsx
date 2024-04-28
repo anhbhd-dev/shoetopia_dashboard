@@ -1,9 +1,13 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { Modal, Upload } from "antd";
-import React from "react";
 import useMultipleUpload from "../../hooks/useMultipleUpload";
+import { useEffect } from "react";
 
-const MultipleUpload: React.FC = () => {
+export type MultipleUploadType = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onSetFieldValue: any;
+};
+const MultipleUpload = ({ onSetFieldValue }: MultipleUploadType) => {
   const {
     fileList,
     previewOpen,
@@ -20,6 +24,13 @@ const MultipleUpload: React.FC = () => {
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
+
+  useEffect(() => {
+    const fileListBase64 = fileList.map((file) => {
+      return file.url;
+    });
+    onSetFieldValue("images", fileListBase64);
+  }, [fileList, fileList.length, onSetFieldValue]);
   return (
     <>
       <Upload
