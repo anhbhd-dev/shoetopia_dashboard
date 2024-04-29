@@ -9,7 +9,7 @@ export const useCreateVariation = (productId: string) => {
   return useMutation({
     mutationFn: createVariation,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products", productId] });
+      queryClient.invalidateQueries({ queryKey: [productId] });
       toast({
         title: "Thêm thành công",
         status: "success",
