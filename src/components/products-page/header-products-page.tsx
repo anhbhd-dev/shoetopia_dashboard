@@ -54,7 +54,7 @@ export const productSortOptions = [
 
 export type HeaderProductsListingPageProps = {
   sortOption?: SortOption;
-  setSortOption: React.Dispatch<React.SetStateAction<SortOption | undefined>>;
+  setSortOption: React.Dispatch<React.SetStateAction<SortOption>>;
   setSearchKeyword: React.Dispatch<React.SetStateAction<string>>;
 };
 
@@ -71,10 +71,14 @@ export default function HeaderProductsListingPage({
   const handleChangeSortOption = (value: string) => {
     setSortOption(JSON.parse(value));
   };
+
   return (
     <div className="flex justify-between mt-5 mb-10">
       <div className="bg-white rounded-md">
-        <Select onChange={(e) => handleChangeSortOption(e.target.value)}>
+        <Select
+          value={JSON.stringify(sortOption)}
+          onChange={(e) => handleChangeSortOption(e.target.value)}
+        >
           {productSortOptions.map((option) => (
             <option
               key={option.value}

@@ -52,4 +52,50 @@ const SingleUploadAvatar = ({ onSetFieldValue }: SingleUploadAvatarType) => {
   );
 };
 
+export const SingleUpdateAvatar = ({
+  onSetFieldValue,
+}: SingleUploadAvatarType) => {
+  const {
+    image,
+    previewOpen,
+    previewImage,
+    previewTitle,
+    handleCancel,
+    handlePreview,
+    handleChange,
+  } = useSingleUpload();
+  const uploadButton = (
+    <div>
+      <PlusOutlined />
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </div>
+  );
+
+  useEffect(() => {
+    onSetFieldValue(image?.url);
+  }, [image, onSetFieldValue]);
+
+  return (
+    <>
+      <Upload
+        listType="picture-card"
+        fileList={image ? [image] : []}
+        onPreview={handlePreview}
+        onChange={handleChange}
+        beforeUpload={() => false}
+      >
+        {image ? null : uploadButton}
+      </Upload>
+      <Modal
+        open={previewOpen}
+        title={previewTitle}
+        footer={null}
+        onCancel={handleCancel}
+      >
+        <img alt="example" style={{ width: "100%" }} src={previewImage} />
+      </Modal>
+    </>
+  );
+};
+
 export default SingleUploadAvatar;

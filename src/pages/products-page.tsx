@@ -2,13 +2,17 @@ import { Skeleton, useToast } from "@chakra-ui/react";
 import { useState } from "react";
 import { useProducts } from "../apis/queries/useProducts";
 import Pagination from "../components/pagination";
-import HeaderProductsListingPage from "../components/products-page/header-products-page";
+import HeaderProductsListingPage, {
+  productSortOptions,
+} from "../components/products-page/header-products-page";
 import ProductListingTable from "../components/products-page/products-listing-table";
 import { SortOption } from "./categories-page";
 
 export default function ProductsListingPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortOption, setSortOption] = useState<SortOption>();
+  const [sortOption, setSortOption] = useState<SortOption>(
+    JSON.parse(productSortOptions[2].value)
+  );
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const toast = useToast();
   const { isPending, isError, data, error } = useProducts({

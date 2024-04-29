@@ -58,17 +58,16 @@ export const createProduct = async (productData: ProductFormType) => {
     throw new Error(error as string);
   }
 };
-export type UpdateCategoryType = { _id: string; categoryName: string };
-export const updateCategory = async (data: UpdateCategoryType) => {
-  const updatedData = {
-    name: data.categoryName,
-  };
 
+export type UpdateProductDataType = Partial<ProductFormType> & {
+  productId: string;
+};
+export const updateProduct = async (data: UpdateProductDataType) => {
   const response = await axiosInstance.put(
-    `http://${import.meta.env.VITE_BASE_API_ENDPOINT}/api/v1/admin/categories/${
-      data._id
+    `http://${import.meta.env.VITE_BASE_API_ENDPOINT}/api/v1/admin/products/${
+      data.productId
     }`,
-    updatedData
+    data
   );
 
   if (response.status === 200) {

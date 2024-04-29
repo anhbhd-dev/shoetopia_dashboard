@@ -53,5 +53,54 @@ const MultipleUpload = ({ onSetFieldValue }: MultipleUploadType) => {
     </>
   );
 };
+export type MultipleUpdateImageType = MultipleUploadType;
+export const MultipleUpdateImages = ({
+  onSetFieldValue,
+}: MultipleUpdateImageType) => {
+  const {
+    fileList,
+    previewOpen,
+    previewImage,
+    previewTitle,
+    handleCancel,
+    handlePreview,
+    handleChange,
+  } = useMultipleUpload();
+
+  const uploadButton = (
+    <div>
+      <PlusOutlined />
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </div>
+  );
+
+  useEffect(() => {
+    const fileListBase64 = fileList.map((file) => {
+      return file.url;
+    });
+    onSetFieldValue(fileListBase64);
+  }, [fileList, fileList.length, onSetFieldValue]);
+  return (
+    <>
+      <Upload
+        listType="picture-card"
+        fileList={fileList}
+        onPreview={handlePreview}
+        onChange={handleChange}
+        beforeUpload={() => false}
+      >
+        {fileList.length >= 8 ? null : uploadButton}
+      </Upload>
+      <Modal
+        open={previewOpen}
+        title={previewTitle}
+        footer={null}
+        onCancel={handleCancel}
+      >
+        <img alt="example" style={{ width: "100%" }} src={previewImage} />
+      </Modal>
+    </>
+  );
+};
 
 export default MultipleUpload;

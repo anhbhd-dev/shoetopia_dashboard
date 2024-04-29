@@ -1,32 +1,84 @@
 import {
   Badge,
+  Box,
+  Button,
   Card,
   CardBody,
   CardHeader,
+  FormControl,
+  FormLabel,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
   Table,
   TableContainer,
   Tbody,
   Td,
   Thead,
   Tr,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { Image } from "antd";
+import { Image, Skeleton } from "antd";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { useEditProduct } from "../apis/queries/useEditProduct";
 import { useSingleProduct } from "../apis/queries/useSingleProduct";
+import { ModalEditProduct } from "../components/product-detail/edit-product";
+import { MultipleUpdateImages } from "../components/products-page/multiple-upload";
+import { SingleUpdateAvatar } from "../components/products-page/single-upload";
 import { AddVariationModalButton } from "../components/variation/add-variation-modal";
 import DeleteVariationModalButton from "../components/variation/delete-product-modal";
 import { UpdateVariationModalButton } from "../components/variation/update-variation-modal";
 import { formatDate } from "../utils/format-date";
 import { formatMoneyVND } from "../utils/format-money";
+import { uploadToCloudinary } from "../utils/upload-to-cloudinary";
 export default function ProductDetailPage() {
   const { id } = useParams();
-  const { data: product } = useSingleProduct(id as string);
+  const { data: product, isPending } = useSingleProduct(id as string);
+  const {
+    isOpen: isOpenEditProduct,
+    onOpen: onOpenEditProduct,
+    onClose: onCloseEditProduct,
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenEditAvatar,
+    onOpen: onOpenEditAvatar,
+    onClose: onCloseEditAvatar,
+  } = useDisclosure();
+
+  const {
+    isOpen: isOpenEditImages,
+    onOpen: onOpenEditImages,
+    onClose: onCloseEditImages,
+  } = useDisclosure();
+
+  if (isPending) return <ProductDetailSkeleton />;
 
   return (
     <main>
+      <ModalEditProduct
+        isOpen={isOpenEditProduct}
+        onClose={onCloseEditProduct}
+        product={product}
+        isLoadingProduct={isPending}
+      />
       <Card>
-        <CardHeader className="bg-gray-100">
+        <CardHeader className="flex justify-between bg-gray-100">
           <h1 className="text-lg font-bold uppercase">Chi tiết sản phẩm</h1>
+          <Button
+            onClick={onOpenEditProduct}
+            className="text-sm uppercase"
+            colorScheme="teal"
+            variant="outline"
+          >
+            Edit
+          </Button>
         </CardHeader>
         <CardBody>
           <TableContainer>
@@ -81,21 +133,45 @@ export default function ProductDetailPage() {
       </Card>
 
       <Card className="mt-10">
-        <CardHeader className="bg-gray-100">
+        <CardHeader className="flex justify-between bg-gray-100">
           <h1 className="text-lg font-bold uppercase">Avatar</h1>
+          <Button
+            colorScheme="teal"
+            variant="outline"
+            size="md"
+            onClick={onOpenEditAvatar}
+          >
+            Edit
+          </Button>
         </CardHeader>
         <CardBody>
           <div className="border rounded-md">
             <Image srcSet={product?.avatar} width={150} />
           </div>
+          <ModalEditAvatar
+            isOpen={isOpenEditAvatar}
+            onClose={onCloseEditAvatar}
+          />
         </CardBody>
       </Card>
 
       <Card className="mt-10">
-        <CardHeader className="bg-gray-100">
+        <CardHeader className="flex justify-between bg-gray-100">
           <h1 className="text-lg font-bold uppercase">Hình ảnh sản phẩm</h1>
+          <Button
+            colorScheme="teal"
+            variant="outline"
+            size="md"
+            onClick={onOpenEditImages}
+          >
+            Edit
+          </Button>
         </CardHeader>
         <CardBody>
+          <ModalEditImages
+            isOpen={isOpenEditImages}
+            onClose={onCloseEditImages}
+          />
           <div className="flex gap-4 border rounded-md">
             {product?.images.map((image) => (
               <Image key={image} srcSet={image} width={150} />
@@ -125,7 +201,6 @@ export default function ProductDetailPage() {
               ) : (
                 <p>Hiện tại chưa có biến thể nào cho sản phẩm này</p>
               )}
-
               <Tbody>
                 {product?.variations.map((variation) => (
                   <Tr key={variation._id}>
@@ -147,5 +222,134 @@ export default function ProductDetailPage() {
         </CardBody>
       </Card>
     </main>
+  );
+}
+
+export function ProductDetailSkeleton() {
+  return (
+    <Stack padding={4} spacing={1}>
+      <Skeleton className="h-[240px]">
+        <Box>Hello World!</Box>
+      </Skeleton>
+      <Skeleton className="h-[240px]">
+        <Box>Hello React!</Box>
+      </Skeleton>
+      <Skeleton className="h-[240px]">
+        <Box>Hello ChakraUI!</Box>
+      </Skeleton>
+    </Stack>
+  );
+}
+
+export type ModalEditAvatarType = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+export function ModalEditAvatar({ isOpen, onClose }: ModalEditAvatarType) {
+  const [updatedAvatar, setUpdatedAvatar] = useState<string>();
+  const { id: productId } = useParams();
+  const editProductMutation = useEditProduct(productId as string);
+
+  const handleSubmitUpdateAvatar = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+    const avatarResponseData = await uploadToCloudinary(
+      updatedAvatar as string
+    );
+    editProductMutation.mutate({
+      productId: productId as string,
+      avatar: avatarResponseData?.data?.url,
+    });
+    onClose();
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <form onSubmit={handleSubmitUpdateAvatar}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Cập nhật avatar</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl as="fieldset" mt={5}>
+              <FormLabel as="legend">Tải lên avatar mới</FormLabel>
+              <SingleUpdateAvatar onSetFieldValue={setUpdatedAvatar} />
+            </FormControl>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={onClose}>
+              Huỷ
+            </Button>
+            <Button
+              type="submit"
+              colorScheme="teal"
+              isLoading={editProductMutation.isPending}
+              isDisabled={!updatedAvatar}
+            >
+              Lưu
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </form>
+    </Modal>
+  );
+}
+export type ModalEditImagesType = ModalEditAvatarType;
+export function ModalEditImages({ isOpen, onClose }: ModalEditImagesType) {
+  const [updatedImages, setUpdatedImages] = useState<string[]>();
+  const { id: productId } = useParams();
+  const editProductMutation = useEditProduct(productId as string);
+
+  const handleSubmitUpdateImages = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+
+    const imagesResponseData = await Promise.all(
+      (updatedImages as string[]).map((image) => uploadToCloudinary(image))
+    );
+
+    const newImages = imagesResponseData.map((image) => image.data.url);
+
+    editProductMutation.mutate({
+      productId: productId as string,
+      images: newImages,
+    });
+    onClose();
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <form onSubmit={handleSubmitUpdateImages}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Cập nhật ảnh sản phẩm</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <FormControl as="fieldset" mt={5}>
+              <FormLabel as="legend">Tải lên các ảnh mới</FormLabel>
+              <MultipleUpdateImages onSetFieldValue={setUpdatedImages} />
+            </FormControl>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={onClose}>
+              Huỷ
+            </Button>
+            <Button
+              type="submit"
+              colorScheme="teal"
+              isLoading={editProductMutation.isPending}
+              isDisabled={!updatedImages?.length}
+            >
+              Lưu
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </form>
+    </Modal>
   );
 }

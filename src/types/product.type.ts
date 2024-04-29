@@ -1,13 +1,13 @@
 import { Variation } from "./variation.type";
 
 export type ProductFormType = {
-  name: string;
-  description: string;
+  name?: string;
+  description?: string;
   isHot?: boolean;
   isActive?: boolean;
-  categoryId: string;
-  avatar: string;
-  images: string[];
+  categoryId?: string;
+  avatar?: string;
+  images?: string[];
 };
 
 export type Image = string[];
