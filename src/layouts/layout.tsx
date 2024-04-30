@@ -35,12 +35,12 @@ interface LinkItemProps {
   linkTo: string;
 }
 const LinkItems: Array<LinkItemProps> = [
-  { name: "Quản lý danh mục", linkTo: "/categories", icon: BiCategory },
-  { name: "Quản lý sản phẩm", linkTo: "/products", icon: GiConverseShoe },
-  { name: "Quản lý đơn hàng", linkTo: "/orders", icon: PiPackageDuotone },
+  { name: "Quản lý danh mục", linkTo: "categories", icon: BiCategory },
+  { name: "Quản lý sản phẩm", linkTo: "products", icon: GiConverseShoe },
+  { name: "Quản lý đơn hàng", linkTo: "orders", icon: PiPackageDuotone },
   {
     name: "Phương thức thanh toán",
-    linkTo: "/payment-methods",
+    linkTo: "payment-methods",
     icon: MdOutlinePayments,
   },
 ];
@@ -96,13 +96,22 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       {...rest}
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Text
-          fontSize="2xl"
-          fontFamily="monospace"
-          className="!font-extrabold uppercase"
-        >
-          Shoetopia
-        </Text>
+        <div className="flex flex-col items-center">
+          <Text
+            fontSize="2xl"
+            fontFamily="monospace"
+            className="!font-extrabold uppercase"
+          >
+            Shoetopia
+          </Text>
+          <Text
+            fontSize="small"
+            fontFamily="monospace"
+            className="!font-extrabold"
+          >
+            Dashboard
+          </Text>
+        </div>
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
       {LinkItems.map((link) => (

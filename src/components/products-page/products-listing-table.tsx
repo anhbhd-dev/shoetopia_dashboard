@@ -1,7 +1,6 @@
 import {
   Badge,
   Button,
-  Image,
   Table,
   TableContainer,
   Tbody,
@@ -15,7 +14,7 @@ import { Product } from "../../types/product.type";
 import { formatDate } from "../../utils/format-date";
 import DeleteProductModal from "./delete-product-modal";
 import { Link } from "react-router-dom";
-
+import { Image } from "antd";
 export type ProductsListingProps = {
   products: Product[];
 };
@@ -48,7 +47,6 @@ export default function ProductListingTable({
                     className="rounded-lg"
                     src={item.avatar}
                     width={"80px"}
-                    alt="Dan Abram"
                   />
                 </Td>
                 <Td>{item.name}</Td>
@@ -66,7 +64,7 @@ export default function ProductListingTable({
                 </Td>
                 <Td width={"150px"}>
                   <div className="flex gap-5">
-                    <Link to={`/products/${item._id}`}>
+                    <Link to={`${item._id}`}>
                       <Button variant={"outline"} colorScheme="blue">
                         <FaEye />
                       </Button>

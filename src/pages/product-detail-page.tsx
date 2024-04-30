@@ -22,8 +22,9 @@ import {
   Thead,
   Tr,
   useDisclosure,
+  Skeleton,
 } from "@chakra-ui/react";
-import { Image, Skeleton } from "antd";
+import { Image } from "antd";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useEditProduct } from "../apis/queries/useEditProduct";
