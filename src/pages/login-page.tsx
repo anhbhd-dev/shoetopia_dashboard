@@ -12,17 +12,18 @@ import {
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { AxiosError } from "axios";
+import { ErrorMessage, Field, Form, Formik } from "formik";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import {
   UserLoginFormType,
   fetchUserProfile,
   login,
 } from "../apis/user.services";
-import { AxiosError } from "axios";
-import { useAuthContext } from "../hooks/useAuthContext";
 import { UserData } from "../contexts/auth-context";
-import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email("Email không hợp lệ").required("Email là bắt buộc"),
@@ -37,9 +38,18 @@ export type LoginSuccessResponse = {
 };
 
 export default function LoginForm() {
-  const { setUser } = useAuthContext();
+  const { setUser, user } = useAuthContext();
+  const [isLoggedInChecking, setIsLoggedInChecking] = useState<boolean>(true);
   const navigate = useNavigate();
   const toast = useToast();
+
+  useEffect(() => {
+    if (user.isAuthenticated) navigate("/admin/categories");
+    setIsLoggedInChecking(false);
+  }, [user, navigate]);
+
+  if (isLoggedInChecking) return null;
+
   const handleSubmit = async (values: UserLoginFormType, actions) => {
     try {
       const loginRes: LoginSuccessResponse = await login(values);
