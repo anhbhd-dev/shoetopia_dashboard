@@ -28,6 +28,7 @@ import { GiConverseShoe } from "react-icons/gi";
 import { MdOutlinePayments } from "react-icons/md";
 import { PiPackageDuotone } from "react-icons/pi";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 interface LinkItemProps {
   name: string;
@@ -47,12 +48,10 @@ const LinkItems: Array<LinkItemProps> = [
 
 export default function SidebarWithHeader() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const bgColor = useColorModeValue("gray.100", "gray.900");
+
   return (
-    <Box
-      minH="100vh"
-      bg={useColorModeValue("gray.100", "gray.900")}
-      className="!bg-white"
-    >
+    <Box minH="100vh" bg={bgColor} className="!bg-white">
       <SidebarContent
         onClose={() => onClose}
         display={{ base: "none", md: "block" }}
@@ -157,6 +156,7 @@ interface MobileProps extends FlexProps {
   onOpen: () => void;
 }
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+  const { logout } = useAuthContext();
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -221,10 +221,11 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               bg={useColorModeValue("white", "gray.900")}
               borderColor={useColorModeValue("gray.200", "gray.700")}
             >
-              <MenuItem>Profile</MenuItem>
-              <MenuItem>Settings</MenuItem>
+              <Link to="profile">
+                <MenuItem>Profile</MenuItem>
+              </Link>
               <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              <MenuItem onClick={logout}>Sign out</MenuItem>
             </MenuList>
           </Menu>
         </Flex>
