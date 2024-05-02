@@ -12,12 +12,15 @@ import {
   ModalOverlay,
   useDisclosure,
   useToast,
+  Checkbox,
+  FormErrorMessage,
 } from "@chakra-ui/react";
 import { FaPen } from "react-icons/fa";
 import { Category } from "../../types/category.type";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateCategory } from "../../apis/category-services";
 import { useState } from "react";
+import { useProducts } from "../../apis/queries/useProducts";
 
 export type ModalEditCategoryProps = {
   category: Category;
@@ -28,7 +31,12 @@ export function ModalEditCategory({ category }: ModalEditCategoryProps) {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [categoryName, setCategoryName] = useState<string>(category.name);
-
+  const [isShowAtHomePage, setIsShowAtHomePage] = useState<boolean>(
+    category.isShowAtHomePage ?? false
+  );
+  const { data: productsInThisCategories } = useProducts({
+    categories: category._id,
+  });
   const updateCategoryMutation = useMutation({
     mutationFn: updateCategory,
     onSuccess: () => {
@@ -55,7 +63,11 @@ export function ModalEditCategory({ category }: ModalEditCategoryProps) {
 
   const handleUpdateCategory = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    updateCategoryMutation.mutate({ _id: category._id, categoryName });
+    updateCategoryMutation.mutate({
+      _id: category._id,
+      categoryName,
+      isShowAtHomePage,
+    });
   };
 
   return (
@@ -78,6 +90,24 @@ export function ModalEditCategory({ category }: ModalEditCategoryProps) {
                   placeholder="Tên danh mục"
                   value={categoryName}
                 />
+              </FormControl>
+              <FormControl
+                className="mt-4 "
+                isInvalid={!productsInThisCategories?.products?.length}
+              >
+                <div className="flex items-center">
+                  <FormLabel>Hiển thị ở trang chủ?</FormLabel>
+                  <Checkbox
+                    isDisabled={!productsInThisCategories?.products.length}
+                    isChecked={isShowAtHomePage}
+                    onChange={() => setIsShowAtHomePage(!isShowAtHomePage)}
+                    value={categoryName}
+                  />
+                </div>
+                <FormErrorMessage>
+                  Không thể show ở trang chủ vì danh mục này chưa có sản phẩm
+                  nào
+                </FormErrorMessage>
               </FormControl>
             </ModalBody>
 

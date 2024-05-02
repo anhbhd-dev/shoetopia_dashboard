@@ -26,22 +26,22 @@ export const login = async (loginData: UserLoginFormType) => {
   );
   return response.data;
 };
-// export type UpdateVariationType = Partial<CreateVariationType> & {
-//   _id?: string;
-// };
-// export const updateVariation = async (data: UpdateVariationType) => {
-//   const response = await axiosInstance.put(
-//     `http://${import.meta.env.VITE_BASE_API_ENDPOINT}/api/v1/admin/variations/${
-//       data._id
-//     }`,
-//     data
-//   );
+export type updatePasswordType = {
+  password: string;
+  newPassword: string;
+  _id: string;
+};
 
-//   if (response.status === 200) {
-//     return response.data;
-//   }
-//   throw new Error("Failed to update category");
-// };
+export const updateUserPassword = async (data: updatePasswordType) => {
+  const response = await axiosInstance.put(
+    `http://${
+      import.meta.env.VITE_BASE_API_ENDPOINT
+    }/api/v1/admin/users/password/${data._id}`,
+    data
+  );
+
+  return response.data;
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type DeleteVariationPayloadType = {

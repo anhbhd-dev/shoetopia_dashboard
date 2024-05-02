@@ -56,6 +56,7 @@ export function ModalEditProduct({
   });
   const { id: productId } = useParams();
   const editProductMutation = useEditProduct(productId as string);
+
   const { values, setValues, errors, handleChange, handleSubmit, resetForm } =
     useFormik({
       initialValues:
@@ -65,10 +66,12 @@ export function ModalEditProduct({
         } ?? {},
       validationSchema: validationCreateProductSchema,
       onSubmit: async (values) => {
+        const isActiveValue = Boolean(String(values?.isActive) === "true");
+        const isHotValue = Boolean(String(values?.isHot) === "true");
         editProductMutation.mutate({
           ...values,
-          isActive: !!values?.isActive,
-          isHot: !!values?.isHot,
+          isActive: isActiveValue,
+          isHot: isHotValue,
           productId: productId as string,
         });
         onClose();

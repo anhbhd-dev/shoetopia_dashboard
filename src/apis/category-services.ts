@@ -51,10 +51,15 @@ export const createCategory = async (categoryName: string) => {
     console.error(error);
   }
 };
-export type UpdateCategoryType = { _id: string; categoryName: string };
+export type UpdateCategoryType = {
+  _id: string;
+  categoryName: string;
+  isShowAtHomePage?: boolean;
+};
 export const updateCategory = async (data: UpdateCategoryType) => {
   const updatedData = {
     name: data.categoryName,
+    isShowAtHomePage: data.isShowAtHomePage,
   };
 
   const response = await axiosInstance.put(

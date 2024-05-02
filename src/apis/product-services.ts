@@ -5,6 +5,7 @@ import axiosInstance from "./axios-initial";
 export type ProductParamsType = {
   name?: string;
   page?: number;
+  categories?: string;
   limit?: number;
   sortBy?: string;
   orderBy?: string;
