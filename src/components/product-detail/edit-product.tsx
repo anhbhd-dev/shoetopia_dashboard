@@ -59,11 +59,10 @@ export function ModalEditProduct({
 
   const { values, setValues, errors, handleChange, handleSubmit, resetForm } =
     useFormik({
-      initialValues:
-        {
-          ...product,
-          categoryId: product?.category?._id,
-        } ?? {},
+      initialValues: {
+        ...product,
+        categoryId: product?.category?._id,
+      },
       validationSchema: validationCreateProductSchema,
       onSubmit: async (values) => {
         const isActiveValue = Boolean(String(values?.isActive) === "true");
