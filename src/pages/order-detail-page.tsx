@@ -144,6 +144,7 @@ export default function OrderDetailPage() {
                   <Th>Avatar</Th>
                   <Th>Tên sản phẩm</Th>
                   <Th>Đơn giá</Th>
+                  <Th>Size</Th>
                   <Th>Số lượng</Th>
                   <Th>Sub-total</Th>
                   <Th></Th>
@@ -163,6 +164,7 @@ export default function OrderDetailPage() {
                       </Td>
                       <Td>{item.product.name}</Td>
                       <Td>{formatMoneyVND(item.price)}</Td>
+                      <Td>{item.variation.size}</Td>
                       <Td>{item.quantity}</Td>
                       <Td>{formatMoneyVND(item.price * item.quantity)}</Td>
                     </Tr>
@@ -215,7 +217,7 @@ export default function OrderDetailPage() {
                     Phần trăm phí vận chuyển
                   </Td>
                   <Td className="text-wrap">
-                    {formatMoneyVND(order?.shippingFeePercentage || 0)}
+                    {order?.shippingFeePercentage || 0}%
                   </Td>
                 </Tr>
                 <Tr className="flex gap-10">
@@ -363,7 +365,13 @@ function ModalConfirmChangeStatusOrderButton({
             <Button mr={3} onClick={onClose} variant="ghost">
               Đóng
             </Button>
-            <Button onClick={onClick} colorScheme="teal">
+            <Button
+              onClick={() => {
+                onClick();
+                onClose();
+              }}
+              colorScheme="teal"
+            >
               Xác nhận
             </Button>
           </ModalFooter>
