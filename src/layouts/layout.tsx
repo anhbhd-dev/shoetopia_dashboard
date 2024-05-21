@@ -29,13 +29,14 @@ import { MdOutlinePayments } from "react-icons/md";
 import { PiPackageDuotone } from "react-icons/pi";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuthContext } from "../hooks/useAuthContext";
-
+import { FaChartBar } from "react-icons/fa";
 interface LinkItemProps {
   name: string;
   icon: IconType;
   linkTo: string;
 }
 export const LinkItems: Array<LinkItemProps> = [
+  { name: "Xem thống kê", linkTo: "statistic", icon: FaChartBar },
   { name: "Quản lý danh mục", linkTo: "categories", icon: BiCategory },
   { name: "Quản lý sản phẩm", linkTo: "products", icon: GiConverseShoe },
   { name: "Quản lý đơn hàng", linkTo: "orders", icon: PiPackageDuotone },

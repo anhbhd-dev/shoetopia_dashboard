@@ -15,6 +15,20 @@ export const fetchUserProfile = async (): Promise<User | undefined> => {
   }
 };
 
+export const getCountUser = async (): Promise<number> => {
+  try {
+    const response = await axiosInstance.get(
+      `http://${
+        import.meta.env.VITE_BASE_API_ENDPOINT
+      }/api/v1/admin/users/count`
+    );
+    return response.data;
+  } catch (error) {
+    // Xử lý lỗi
+    throw Error(error as string);
+  }
+};
+
 export type UserLoginFormType = {
   email: string;
   password: string;

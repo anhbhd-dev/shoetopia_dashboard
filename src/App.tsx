@@ -9,6 +9,7 @@ import PaymentMethodsPage from "./pages/payment-methods-page";
 import ProductDetailPage from "./pages/product-detail-page";
 import ProductsListingPage from "./pages/products-page";
 import ProtectedRoute from "./layouts/protected-route";
+import Statistics from "./pages/statistics-page";
 
 export default function App() {
   return (
@@ -16,7 +17,8 @@ export default function App() {
       <Route path="/admin/auth/login" element={<LoginForm />} />
       <Route path="/admin/*" element={<ProtectedRoute />}>
         <Route element={<SidebarWithHeader />}>
-          <Route index element={<Navigate to="categories" />} />
+          <Route index element={<Navigate to="statistic" />} />
+          <Route path="statistic" element={<Statistics />} />
           <Route path="categories" element={<CategoriesPage />} />
           <Route path="orders" element={<OrderListingPage />} />
           <Route path="orders/:id" element={<OrderDetailPage />} />

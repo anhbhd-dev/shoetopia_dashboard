@@ -1,5 +1,6 @@
 import { OrderBy, SortBy } from "../enum/sort.enum";
 import { Product, ProductFormType } from "../types/product.type";
+import { ItemsSaleReport } from "../types/statistic";
 import axiosInstance from "./axios-initial";
 
 export type ProductParamsType = {
@@ -39,6 +40,32 @@ export const fetchProductById = async (id: string): Promise<Product> => {
       `http://${
         import.meta.env.VITE_BASE_API_ENDPOINT
       }/api/v1/admin/products/${id}`
+    );
+    return response.data;
+  } catch (error) {
+    // Xử lý lỗi
+    throw new Error(error as string);
+  }
+};
+export const countProducts = async (): Promise<number> => {
+  try {
+    const response = await axiosInstance.get(
+      `http://${
+        import.meta.env.VITE_BASE_API_ENDPOINT
+      }/api/v1/admin/products/statistics/count-products`
+    );
+    return response.data;
+  } catch (error) {
+    // Xử lý lỗi
+    throw new Error(error as string);
+  }
+};
+export const fetchItemsSaleReport = async (): Promise<ItemsSaleReport> => {
+  try {
+    const response = await axiosInstance.get(
+      `http://${
+        import.meta.env.VITE_BASE_API_ENDPOINT
+      }/api/v1/admin/orders/statistics/items-sale`
     );
     return response.data;
   } catch (error) {

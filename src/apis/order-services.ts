@@ -35,6 +35,32 @@ export const fetchOrders = async (queryParams?: OrderParamsType) => {
     throw new Error(error as string);
   }
 };
+export const countRevenue = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `http://${
+        import.meta.env.VITE_BASE_API_ENDPOINT
+      }/api/v1/admin/orders/statistics/total-revenue`
+    );
+    return response.data;
+  } catch (error) {
+    // Xử lý lỗi
+    throw new Error(error as string);
+  }
+};
+export const countOrders = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `http://${
+        import.meta.env.VITE_BASE_API_ENDPOINT
+      }/api/v1/admin/orders/statistics/order-today`
+    );
+    return response.data;
+  } catch (error) {
+    // Xử lý lỗi
+    throw new Error(error as string);
+  }
+};
 
 export const fetchOrderById = async (id: string): Promise<Order> => {
   try {
