@@ -35,7 +35,7 @@ interface LinkItemProps {
   icon: IconType;
   linkTo: string;
 }
-export const LinkItems: Array<LinkItemProps> = [
+const LinkItems: Array<LinkItemProps> = [
   { name: "Xem thống kê", linkTo: "statistic", icon: FaChartBar },
   { name: "Quản lý danh mục", linkTo: "categories", icon: BiCategory },
   { name: "Quản lý sản phẩm", linkTo: "products", icon: GiConverseShoe },
@@ -128,7 +128,7 @@ interface NavItemProps extends FlexProps {
   children: ReactText;
   linkTo: string;
 }
-export const NavItem = ({ icon, linkTo, children, ...rest }: NavItemProps) => {
+const NavItem = ({ icon, linkTo, children, ...rest }: NavItemProps) => {
   const { pathname } = useLocation();
   const isActive = pathname.includes(linkTo);
   return (

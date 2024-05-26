@@ -10,6 +10,7 @@ import ProductDetailPage from "./pages/product-detail-page";
 import ProductsListingPage from "./pages/products-page";
 import ProtectedRoute from "./layouts/protected-route";
 import Statistics from "./pages/statistics-page";
+import NotFoundPage from "./not-found";
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="payment-methods" element={<PaymentMethodsPage />} />
           <Route path="profile" element={<UserProfileEdit />} />
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   );

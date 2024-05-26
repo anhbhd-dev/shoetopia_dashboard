@@ -34,6 +34,8 @@ import { useSingleOrder } from "../apis/queries/useSingleOrder";
 import { OrderStatus, PaymentMethod, PaymentStatus } from "../enum/order";
 import { formatMoneyVND } from "../utils/format-money";
 import { useUpdateOrderStatus } from "../apis/queries/useUpdateOrderStatus";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import OrderPDF from "../components/order-page/order-pdf";
 export default function OrderDetailPage() {
   const { id } = useParams();
   const {
@@ -249,7 +251,26 @@ export default function OrderDetailPage() {
           </Table>
         </CardBody>
       </Card>
-      <div className="flex justify-end mt-5 mb-20">
+      <div className="flex justify-between mt-5 mb-20">
+        <div>
+          <PDFDownloadLink
+            document={<OrderPDF order={order} />}
+            fileName="invoice"
+          >
+            {({ loading }) => {
+              return (
+                <Button
+                  colorScheme="teal"
+                  isLoading={loading}
+                  variant="outline"
+                  size="md"
+                >
+                  Xuất PDF
+                </Button>
+              );
+            }}
+          </PDFDownloadLink>
+        </div>
         {order && (
           <OrderStatusButton
             orderStatus={order?.orderStatus.slice(-1)[0] as OrderStatus}
@@ -324,7 +345,7 @@ export const OrderStatusButton = ({
     />
   ) : null;
 };
-export type ModalConfirmChangeStatusOrderButtonProps = {
+type ModalConfirmChangeStatusOrderButtonProps = {
   buttonText: string;
   className?: string;
   variant?: string;
@@ -381,7 +402,7 @@ function ModalConfirmChangeStatusOrderButton({
   );
 }
 
-export function OrderDetailSkeleton() {
+function OrderDetailSkeleton() {
   return (
     <Stack padding={4} spacing={1}>
       <Skeleton className="h-[50px] mb-5">
