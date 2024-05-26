@@ -1,16 +1,14 @@
-import { useEffect, useState } from "react";
-import CardStatistics from "../components/statistics/card-statistics";
-import { getCountUser } from "../apis/user.services";
-import { countOrders, countRevenue } from "../apis/order-services";
-import { formatMoneyVND } from "../utils/format-money";
 import { Skeleton, useToast } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { countProducts } from "../apis/product-services";
+import { getCountUser } from "../apis/user.services";
+import CardStatistics from "../components/statistics/card-statistics";
 import SaleItemsTable from "../components/statistics/sale-item-table";
+import { useCountOrderToday } from "../apis/queries/useItemSaleReport";
 
 export default function Statistics() {
   const [usersCount, setUsersCount] = useState(0);
-  const [totalRevenue, setTotalRevenue] = useState(0);
-  const [ordersToday, setOrdersToday] = useState(0);
+  const { data: orderToday } = useCountOrderToday();
   const [isLoading, setIsLoading] = useState(true);
   const [totalProducts, setTotalProducts] = useState(0);
   const toast = useToast();
@@ -21,20 +19,13 @@ export default function Statistics() {
     const getDashboard = async () => {
       setIsLoading(true);
       const usersCountRes = await getCountUser();
-      const totalRevenue = await countRevenue();
-      const ordersToday = await countOrders();
+
       const totalProductsRes = await countProducts();
 
-      await Promise.all([
-        usersCountRes,
-        totalRevenue,
-        ordersToday,
-        totalProductsRes,
-      ])
-        .then(([userCountRes, totalRevenueRes]) => {
+      await Promise.all([usersCountRes, totalProductsRes])
+        .then(([userCountRes, totalProductsRes]) => {
           setUsersCount(userCountRes);
-          setTotalRevenue(totalRevenueRes);
-          setOrdersToday(ordersToday);
+
           setTotalProducts(totalProductsRes);
           timer = setTimeout(() => {
             setIsLoading(false);
@@ -68,7 +59,7 @@ export default function Statistics() {
             <p className="text-base font-bold text-gray-500">
               Đơn hàng hôm nay
             </p>
-            <div className="font-bold">{ordersToday}</div>
+            <div className="font-bold">{orderToday}</div>
           </div>
         </CardStatistics>
         <CardStatistics className="p-5">
@@ -96,18 +87,6 @@ export default function Statistics() {
             <div className="font-bold">{usersCount}</div>
           </div>
         </CardStatistics>
-        <CardStatistics className="p-5">
-          <div className="flex items-center justify-center h-16">
-            <img
-              className="object-cover h-full"
-              src="/images/revenue-icon.png"
-            />
-          </div>
-          <div className="flex flex-col gap-5">
-            <p className="text-base font-bold text-gray-500">Tổng doanh thu</p>
-            <div className="font-bold">{formatMoneyVND(totalRevenue)}</div>
-          </div>
-        </CardStatistics>
       </div>
       <SaleItemsTable />
     </div>
@@ -124,13 +103,6 @@ function DashboardSkeleton() {
           </Skeleton>
         ))}
       </div>
-      {/* <div className="flex justify-end gap-2 mt-10">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton className="w-10 h-10 mb-5" key={i}>
-            <div>contents wrapped</div>
-          </Skeleton>
-        ))}
-      </div> */}
     </>
   );
 }

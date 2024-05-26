@@ -60,12 +60,23 @@ export const countProducts = async (): Promise<number> => {
     throw new Error(error as string);
   }
 };
-export const fetchItemsSaleReport = async (): Promise<ItemsSaleReport> => {
+export const fetchItemsSaleReport = async (
+  page = 1,
+  startDate?: string,
+  endDate?: string
+): Promise<ItemsSaleReport> => {
   try {
     const response = await axiosInstance.get(
       `http://${
         import.meta.env.VITE_BASE_API_ENDPOINT
-      }/api/v1/admin/orders/statistics/items-sale`
+      }/api/v1/admin/orders/statistics/items-sale`,
+      {
+        params: {
+          page,
+          startDate,
+          endDate,
+        },
+      }
     );
     return response.data;
   } catch (error) {

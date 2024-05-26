@@ -35,12 +35,18 @@ export const fetchOrders = async (queryParams?: OrderParamsType) => {
     throw new Error(error as string);
   }
 };
-export const countRevenue = async () => {
+export const countRevenue = async (startDate?: string, endDate?: string) => {
   try {
     const response = await axiosInstance.get(
       `http://${
         import.meta.env.VITE_BASE_API_ENDPOINT
-      }/api/v1/admin/orders/statistics/total-revenue`
+      }/api/v1/admin/orders/statistics/total-revenue`,
+      {
+        params: {
+          startDate,
+          endDate,
+        },
+      }
     );
     return response.data;
   } catch (error) {

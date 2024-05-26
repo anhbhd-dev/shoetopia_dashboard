@@ -51,8 +51,8 @@ export default function OrdersListingSection({ orders }: OrdersListingProps) {
                 <Td>
                   {order.payment.paymentMethod ===
                   PaymentMethod.CASH_ON_DELIVERY
-                    ? "COD"
-                    : "Online banking"}
+                    ? "Giao hàng nhận tiền"
+                    : "Thanh toán online"}
                 </Td>
                 <Td>{formatDate(order.createdAt)}</Td>
                 <Td>{order.phoneNumber}</Td>

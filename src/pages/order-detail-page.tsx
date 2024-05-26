@@ -192,8 +192,8 @@ export default function OrderDetailPage() {
                   <Td className="text-wrap">
                     {order?.payment.paymentMethod ===
                     PaymentMethod.CASH_ON_DELIVERY
-                      ? "COD"
-                      : "Online banking"}
+                      ? "Giao hàng nhận tiền"
+                      : "Thanh toán online"}
                   </Td>
                 </Tr>
 

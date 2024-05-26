@@ -8,14 +8,29 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { useItemSaleReport } from "../../apis/queries/useItemSaleReport";
 import { Image } from "antd";
-import { formatMoneyVND } from "../../utils/format-money";
-import { useState } from "react";
 import { RangeDatepicker } from "chakra-dayzed-datepicker";
+import { useState } from "react";
+import {
+  useItemSaleReport,
+  useRevenue,
+} from "../../apis/queries/useItemSaleReport";
+import { formatMoneyVND } from "../../utils/format-money";
+import Pagination from "../pagination";
+import CardStatistics from "./card-statistics";
 export default function SaleItemsTable() {
-  const { isPending, isError, data: itemSaleData, error } = useItemSaleReport();
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const { data: itemSaleData } = useItemSaleReport(
+    currentPage,
+    selectedDates[0] ? selectedDates[0].toISOString() : undefined,
+    selectedDates[1] ? selectedDates[1].toISOString() : undefined
+  );
+  const { data: revenue } = useRevenue(
+    selectedDates[0] ? selectedDates[0].toISOString() : undefined,
+    selectedDates[1] ? selectedDates[1].toISOString() : undefined
+  );
+
   const handleClearFilter = () => {
     setSelectedDates([]);
   };
@@ -35,6 +50,15 @@ export default function SaleItemsTable() {
           Bỏ lọc
         </Button>
       </div>
+      <CardStatistics className="p-5 !w-[400px] mt-10">
+        <div className="flex items-center justify-center h-16">
+          <img className="object-cover h-full" src="/images/revenue-icon.png" />
+        </div>
+        <div className="flex flex-col gap-5">
+          <p className="text-base font-bold text-gray-500">Tổng doanh thu</p>
+          <div className="font-bold">{formatMoneyVND(revenue)}</div>
+        </div>
+      </CardStatistics>
       <p className="my-10 text-2xl font-bold">Thống kê sản phẩm được bán ra</p>
       <div>
         <TableContainer
@@ -79,6 +103,14 @@ export default function SaleItemsTable() {
             </Tbody>
           </Table>
         </TableContainer>
+      </div>
+      <div className="flex justify-end mr-20">
+        <Pagination
+          className="flex gap-4"
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalPage={itemSaleData?.totalPages || 1}
+        />
       </div>
     </div>
   );
